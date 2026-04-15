@@ -71,4 +71,4 @@ async def analyze_pdf(file: UploadFile = File(...)):
 def root():
     return FileResponse(PUBLIC_DIR / "index.html")
 
-app.mount("/", StaticFiles(directory=PUBLIC_DIR, html=True), name="static")
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
