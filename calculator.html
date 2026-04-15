@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حاسبة PDF الهندسي | MAHABAT ALFAN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .upload-box{
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:24px;
+      padding:28px;
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      text-align:center;
+    }
+    .upload-box.drag{border-color:rgba(24,182,201,.8); background:rgba(24,182,201,.08)}
+    .calc-grid{display:grid;grid-template-columns:1fr .9fr;gap:20px}
+    .calc-result strong{display:block;font-size:2rem;margin-bottom:8px}
+    .mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .mini-card{padding:18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.03)}
+    .file-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:rgba(24,182,201,.12);border:1px solid rgba(24,182,201,.18)}
+    .spinner{width:24px;height:24px;border:3px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media (max-width: 980px){.calc-grid,.mini-grid{grid-template-columns:1fr !important}}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="container topbar-wrap">
+      <div>واتساب مباشر: <a href="https://wa.me/966564391706" target="_blank" rel="noopener">+966 56 439 1706</a></div>
+      <div>MAHABAT ALFAN</div>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container header-wrap">
+      <a class="brand" href="index.html">
+        <img src="assets/logo.jpeg" alt="MAHABAT ALFAN">
+        <div>
+          <strong>مهابة الفن</strong>
+          <span>للدعاية والإعلان</span>
+        </div>
+      </a>
+      <div class="nav-area">
+        <a class="btn btn-ghost" href="index.html">الرئيسية</a>
+        <a class="btn btn-primary" href="calculator.html">حاسبة PDF</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="page-title">
+        <div>
+          <h1>حاسبة PDF الهندسي</h1>
+          <p>ارفع ملف PDF هندسي وسيتم حساب إجمالي الأطوال تلقائيًا، مع نتيجة تقريبية بالمتر وسعر تقديري.</p>
+        </div>
+      </div>
+
+      <div class="calc-grid">
+        <section class="card">
+          <div id="dropZone" class="upload-box">
+            <div style="font-size:1.15rem;font-weight:800;margin-bottom:10px">اسحب ملف PDF هنا أو اختره يدويًا</div>
+            <p class="muted" style="margin-top:0">الأفضل أن يكون الملف PDF هندسي Vector وليس صورة ممسوحة.</p>
+            <input id="pdfInput" type="file" accept=".pdf,application/pdf" class="hidden">
+            <div class="action-row" style="justify-content:center;margin-top:16px">
+              <button id="pickBtn" class="btn btn-accent">اختيار ملف PDF</button>
+            </div>
+            <div id="fileInfo" style="margin-top:16px"></div>
+          </div>
+
+          <div class="grid-2" style="margin-top:18px">
+            <div>
+              <label>سعر المتر (اختياري)</label>
+              <input id="pricePerMeter" class="input" type="number" step="0.01" placeholder="مثال: 50">
+            </div>
+            <div>
+              <label>العملة / الملاحظة</label>
+              <input id="currency" class="input" placeholder="مثال: ريال سعودي">
+            </div>
+          </div>
+
+          <div class="action-row" style="margin-top:18px">
+            <button id="analyzeBtn" class="btn btn-primary" disabled>تحليل الملف</button>
+            <button id="whatsBtn" class="btn btn-ghost" disabled>إرسال النتيجة على واتساب</button>
+          </div>
+
+          <div class="notice" style="margin-top:18px">
+            ملاحظة: هذه الأداة تحسب إجمالي الأطوال من المسارات الهندسية داخل PDF. لو كان الملف صورة فقط، لن تكون النتيجة موثوقة.
+          </div>
+        </section>
+
+        <section class="card">
+          <h3 style="margin-top:0">النتيجة</h3>
+          <div id="idleState" class="muted">لم يتم تحليل أي ملف بعد.</div>
+          <div id="loadingState" class="hidden">
+            <div class="inline"><span class="spinner"></span><span>جاري تحليل الملف...</span></div>
+          </div>
+          <div id="resultState" class="hidden">
+            <div class="calc-result">
+              <strong id="metersValue">0.00 م</strong>
+              <div class="muted">إجمالي الأطوال التقريبي</div>
+            </div>
+            <div class="mini-grid" style="margin-top:18px">
+              <div class="mini-card">
+                <div class="muted">عدد الصفحات</div>
+                <div id="pagesValue" style="font-size:1.3rem;font-weight:800;margin-top:6px">0</div>
+              </div>
+              <div class="mini-card">
+                <div class="muted">عدد المسارات</div>
+                <div id="pathsValue" style="font-size:1.3rem;font-weight:800;margin-top:6px">0</div>
+              </div>
+              <div class="mini-card">
+                <div class="muted">نوع التحليل</div>
+                <div id="analysisValue" style="font-size:1.1rem;font-weight:800;margin-top:6px">PDF Vector</div>
+              </div>
+            </div>
+
+            <div id="priceWrap" class="card" style="margin-top:18px;display:none">
+              <h3 style="margin-top:0">السعر التقديري</h3>
+              <div id="priceValue" style="font-size:2rem;font-weight:900"></div>
+              <p class="muted" style="margin-bottom:0">هذه نتيجة تقديرية أولية قابلة للمراجعة النهائية.</p>
+            </div>
+
+            <div class="card" style="margin-top:18px">
+              <h3 style="margin-top:0">تفاصيل إضافية</h3>
+              <div id="resultMeta" class="muted"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <a class="whatsapp-float" href="https://wa.me/966564391706" target="_blank" rel="noopener">واتساب</a>
+
+  <script>
+    let currentFile = null;
+    let currentResult = null;
+
+    const pdfInput = document.getElementById('pdfInput');
+    const pickBtn = document.getElementById('pickBtn');
+    const dropZone = document.getElementById('dropZone');
+    const fileInfo = document.getElementById('fileInfo');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const whatsBtn = document.getElementById('whatsBtn');
+
+    const idleState = document.getElementById('idleState');
+    const loadingState = document.getElementById('loadingState');
+    const resultState = document.getElementById('resultState');
+
+    function setFile(file){
+      currentFile = file;
+      fileInfo.innerHTML = `<span class="file-pill">${file.name} — ${(file.size / 1024).toFixed(1)} KB</span>`;
+      analyzeBtn.disabled = false;
+    }
+
+    pickBtn.addEventListener('click', () => pdfInput.click());
+    pdfInput.addEventListener('change', e => {
+      const file = e.target.files?.[0];
+      if(file) setFile(file);
+    });
+
+    ['dragenter','dragover'].forEach(evt => {
+      dropZone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropZone.classList.add('drag');
+      });
+    });
+
+    ['dragleave','drop'].forEach(evt => {
+      dropZone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag');
+      });
+    });
+
+    dropZone.addEventListener('drop', e => {
+      const file = e.dataTransfer.files?.[0];
+      if(file && file.name.toLowerCase().endsWith('.pdf')) setFile(file);
+    });
+
+    analyzeBtn.addEventListener('click', async () => {
+      if(!currentFile) return;
+      idleState.classList.add('hidden');
+      resultState.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+      whatsBtn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('file', currentFile);
+
+      try {
+        const res = await fetch('/api/analyze-pdf', { method:'POST', body:formData });
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.detail || 'فشل التحليل');
+
+        currentResult = data;
+        loadingState.classList.add('hidden');
+        resultState.classList.remove('hidden');
+
+        document.getElementById('metersValue').textContent = `${data.total_meters.toFixed(2)} م`;
+        document.getElementById('pagesValue').textContent = data.page_count;
+        document.getElementById('pathsValue').textContent = data.path_count;
+        document.getElementById('analysisValue').textContent = data.analysis_mode || 'PDF Vector';
+        document.getElementById('resultMeta').textContent = `تم تحليل الملف بنجاح. الأطوال محسوبة من المسارات الهندسية داخل صفحات الـ PDF.`;
+
+        const ppm = parseFloat(document.getElementById('pricePerMeter').value || '0');
+        const currency = document.getElementById('currency').value.trim();
+        const priceWrap = document.getElementById('priceWrap');
+        if(ppm > 0){
+          const price = data.total_meters * ppm;
+          priceWrap.style.display = 'block';
+          document.getElementById('priceValue').textContent = `${price.toFixed(2)} ${currency || ''}`.trim();
+        } else {
+          priceWrap.style.display = 'none';
+        }
+
+        whatsBtn.disabled = false;
+      } catch(err){
+        loadingState.classList.add('hidden');
+        idleState.classList.remove('hidden');
+        idleState.textContent = err.message || 'حدث خطأ أثناء التحليل.';
+      }
+    });
+
+    whatsBtn.addEventListener('click', () => {
+      if(!currentResult) return;
+      const ppm = parseFloat(document.getElementById('pricePerMeter').value || '0');
+      const currency = document.getElementById('currency').value.trim();
+      let text = `مرحبًا، أرفقت ملف PDF وتم حساب إجمالي الأطوال تقريبياً.\nإجمالي الأطوال: ${currentResult.total_meters.toFixed(2)} متر\nعدد الصفحات: ${currentResult.page_count}\nعدد المسارات: ${currentResult.path_count}`;
+      if(ppm > 0){
+        const price = currentResult.total_meters * ppm;
+        text += `\nالسعر التقديري: ${price.toFixed(2)} ${currency}`;
+      }
+      window.open(`https://wa.me/966564391706?text=${encodeURIComponent(text)}`, '_blank');
+    });
+  </script>
+</body>
+</html>

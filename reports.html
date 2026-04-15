@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports | MAHABAT ALFAN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="container topbar-wrap">
+      <div><span data-i18n="topPhone">واتساب مباشر</span>: <a href="https://wa.me/966564391706" target="_blank" rel="noopener">+966 56 439 1706</a></div>
+      <div>MAHABAT ALFAN</div>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container header-wrap">
+      <a class="brand" href="index.html">
+        <img src="assets/logo.jpeg" alt="MAHABAT ALFAN">
+        <div>
+          <strong data-i18n="companyName">مهابة الفن</strong>
+          <span data-i18n="companySub">للدعاية والإعلان</span>
+        </div>
+      </a>
+      <div class="nav-area">
+        <button class="lang-btn" id="langToggle">EN</button>
+        <button class="menu-btn">القائمة</button>
+        <nav class="main-nav">
+          
+        <a href="index.html" data-i18n="navHome">الرئيسية</a>
+        <a href="track.html" data-i18n="navTrack">تتبع الأوردر</a>
+        <a href="admin.html">لوحة المدير</a>
+        <a class="active" href="reports.html">التقارير</a>
+        
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  
+<main class="section">
+  <div class="container">
+    <div class="page-title">
+      <div>
+        <h1>تقارير المدير</h1>
+        <p>عرض مؤشرات الأداء وحالات الأوردرات ومتوسط وقت الإنجاز. هذه الصفحة للمدير فقط.</p>
+      </div>
+      <div id="sessionInfo"></div>
+    </div>
+
+    <div class="tabs">
+      <a class="tab" href="admin.html">لوحة المدير</a>
+      <a class="tab active" href="reports.html">التقارير</a>
+    </div>
+
+    <section class="kpis" id="kpisSection"></section>
+
+    <section class="card" style="margin-top:22px">
+      <h3>ملخص الحالات</h3>
+      <div id="summaryGrid" class="grid-2" style="margin-top:16px"></div>
+    </section>
+
+    <section class="card" style="margin-top:22px">
+      <h3>آخر الأوردرات</h3>
+      <div class="table-wrap" style="margin-top:12px">
+        <table>
+          <thead>
+            <tr>
+              <th>اسم العميل</th>
+              <th>رقم الأوردر</th>
+              <th>الحالة</th>
+              <th>وقت التسجيل</th>
+              <th>المدة</th>
+            </tr>
+          </thead>
+          <tbody id="latestOrders"></tbody>
+        </table>
+      </div>
+      <div id="emptyReports" class="empty hidden">لا توجد بيانات متاحة حالياً.</div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer"><div class="container" data-i18n="footerCopy">© 2026 مهابة الفن للدعاية والإعلان</div></footer>
+
+
+  <a class="whatsapp-float" href="https://wa.me/966564391706" target="_blank" rel="noopener" data-i18n="wa">واتساب</a>
+  <script src="app.js"></script>
+  
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  requireRole(['admin']);
+  const orders=getOrders();
+  const stats=calcStats(orders);
+  const avg=estimateAverageDone(orders);
+
+  document.getElementById('kpisSection').innerHTML=`
+    <div class="card"><small>إجمالي الأوردرات</small><h2>${stats.total}</h2></div>
+    <div class="card"><small>جاري التصميم</small><h2>${stats.design}</h2></div>
+    <div class="card"><small>تحت التصنيع</small><h2>${stats.manufacturing}</h2></div>
+    <div class="card"><small>جاهز للاستلام</small><h2>${stats.ready}</h2></div>
+  `;
+  document.getElementById('summaryGrid').innerHTML=`
+    <div class="card"><h3>الأوردرات الملغاة</h3><p class="muted">عدد الأوردرات الملغاة: <strong>${stats.cancelled}</strong></p></div>
+    <div class="card"><h3>متوسط مدة الإنجاز</h3><p class="muted">متوسط الوقت من تسجيل الأوردر حتى اكتماله أو إلغائه: <strong>${avg}</strong> يوم</p></div>
+  `;
+
+  const latest=document.getElementById('latestOrders');
+  const empty=document.getElementById('emptyReports');
+  if(!orders.length){
+    empty.classList.remove('hidden');
+    return;
+  }
+
+  latest.innerHTML=orders.slice(0,10).map(order=>`
+    <tr>
+      <td>${escapeHtml(order.customer||'-')}</td>
+      <td>${escapeHtml(order.orderNo||'-')}</td>
+      <td>${formatStatus(order.status)}</td>
+      <td>${escapeHtml(new Date(order.createdAt).toLocaleString('ar-EG'))}</td>
+      <td>${escapeHtml(formatDuration(order))}</td>
+    </tr>
+  `).join('');
+});
+</script>
+
+</body>
+</html>

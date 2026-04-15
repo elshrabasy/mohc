@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | MAHABAT ALFAN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="topbar">
+    <div class="container topbar-wrap">
+      <div><span data-i18n="topPhone">واتساب مباشر</span>: <a href="https://wa.me/966564391706" target="_blank" rel="noopener">+966 56 439 1706</a></div>
+      <div>MAHABAT ALFAN</div>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container header-wrap">
+      <a class="brand" href="index.html">
+        <img src="assets/logo.jpeg" alt="MAHABAT ALFAN">
+        <div>
+          <strong data-i18n="companyName">مهابة الفن</strong>
+          <span data-i18n="companySub">للدعاية والإعلان</span>
+        </div>
+      </a>
+      <div class="nav-area">
+        <button class="lang-btn" id="langToggle">EN</button>
+        <button class="menu-btn">القائمة</button>
+        <nav class="main-nav">
+          
+        <a href="index.html" data-i18n="navHome">الرئيسية</a>
+        <a href="track.html" data-i18n="navTrack">تتبع الأوردر</a>
+        <a class="active" href="admin.html">لوحة المدير</a>
+        <a href="reports.html">التقارير</a>
+        
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  
+<main class="section">
+  <div class="container">
+    <div class="page-title">
+      <div>
+        <h1>لوحة المدير</h1>
+        <p>صلاحيات كاملة: إضافة، تعديل، إلغاء، حذف نهائي، ومراجعة التقارير.</p>
+      </div>
+      <div id="sessionInfo"></div>
+    </div>
+
+    <div class="tabs">
+      <a class="tab active" href="admin.html">لوحة المدير</a>
+      <a class="tab" href="reports.html">التقارير</a>
+      <a class="tab" href="employees.html">صفحة الموظفين</a>
+    </div>
+
+    <div class="grid-2">
+      <section class="card">
+        <h3 id="formTitle">إضافة أوردر جديد</h3>
+        <div class="form-grid">
+          <input type="hidden" id="orderId">
+          <div><label>اسم العميل</label><input id="customer" class="input"></div>
+          <div><label>رقم الأوردر</label><input id="orderNo" class="input" placeholder="ORD-002"></div>
+          <div><label>رقم الهاتف</label><input id="phone" class="input"></div>
+          <div>
+            <label>الحالة</label>
+            <select id="status" class="select">
+              <option value="design">جاري التصميم</option>
+              <option value="manufacturing">الأوردر تحت التصنيع</option>
+              <option value="ready">الأوردر جاهز للاستلام</option>
+              <option value="cancelled">ملغي</option>
+            </select>
+          </div>
+          <div class="full"><label>وصف الأوردر</label><textarea id="description" class="textarea"></textarea></div>
+          <div class="full"><label>ملاحظات</label><textarea id="notes" class="textarea"></textarea></div>
+          <div class="full hidden" id="cancelWrap"><label>سبب الإلغاء</label><textarea id="cancelReason" class="textarea"></textarea></div>
+        </div>
+        <div class="action-row" style="margin-top:16px">
+          <button id="saveBtn" class="btn btn-primary">حفظ الأوردر</button>
+          <button id="resetBtn" class="btn btn-ghost" type="button">تفريغ الحقول</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>ملاحظات تشغيلية</h3>
+        <div class="notice">عند تحويل الحالة إلى "الأوردر جاهز للاستلام" سيتم فتح رسالة واتساب للعميل إذا كان رقم الهاتف موجودًا.</div>
+        <p class="muted">التقارير موجودة هنا للمدير فقط. وصفحة الموظفين بدون تقارير.</p>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:22px">
+      <div class="action-row" style="justify-content:space-between">
+        <h3 style="margin:0">قائمة الأوردرات</h3>
+        <input id="searchInput" class="input" placeholder="ابحث باسم العميل أو رقم الأوردر" style="max-width:320px">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>اسم العميل</th>
+              <th>رقم الأوردر</th>
+              <th>الحالة</th>
+              <th>المدة</th>
+              <th>الوصف</th>
+              <th>الإجراء</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable"></tbody>
+        </table>
+      </div>
+      <div id="emptyOrders" class="empty hidden">لا توجد أوردرات حتى الآن.</div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer"><div class="container" data-i18n="footerCopy">© 2026 مهابة الفن للدعاية والإعلان</div></footer>
+
+
+  <a class="whatsapp-float" href="https://wa.me/966564391706" target="_blank" rel="noopener" data-i18n="wa">واتساب</a>
+  <script src="app.js"></script>
+  
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  requireRole(['admin']);
+
+  const fields={
+    id:document.getElementById('orderId'),
+    customer:document.getElementById('customer'),
+    orderNo:document.getElementById('orderNo'),
+    phone:document.getElementById('phone'),
+    status:document.getElementById('status'),
+    description:document.getElementById('description'),
+    notes:document.getElementById('notes'),
+    cancelReason:document.getElementById('cancelReason')
+  };
+  const cancelWrap=document.getElementById('cancelWrap');
+  const formTitle=document.getElementById('formTitle');
+  const tbody=document.getElementById('ordersTable');
+  const emptyBox=document.getElementById('emptyOrders');
+  const searchInput=document.getElementById('searchInput');
+
+  function toggleCancel(){cancelWrap.classList.toggle('hidden', fields.status.value!=='cancelled')}
+  function resetForm(){
+    fields.id.value='';fields.customer.value='';fields.orderNo.value='';fields.phone.value='';
+    fields.status.value='design';fields.description.value='';fields.notes.value='';fields.cancelReason.value='';
+    formTitle.textContent='إضافة أوردر جديد';toggleCancel();
+  }
+  function fillForm(order){
+    fields.id.value=order.id;fields.customer.value=order.customer||'';fields.orderNo.value=order.orderNo||'';
+    fields.phone.value=order.phone||'';fields.status.value=order.status||'design';fields.description.value=order.description||'';
+    fields.notes.value=order.notes||'';fields.cancelReason.value=order.cancelReason||'';
+    formTitle.textContent='تعديل الأوردر';toggleCancel();window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function renderTable(){
+    const q=searchInput.value.trim().toLowerCase();
+    const orders=getOrders().filter(o=>!q || (o.customer||'').toLowerCase().includes(q) || (o.orderNo||'').toLowerCase().includes(q));
+    tbody.innerHTML='';
+    emptyBox.classList.toggle('hidden', !!orders.length);
+    orders.forEach(order=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${escapeHtml(order.customer||'-')}</td>
+        <td>${escapeHtml(order.orderNo||'-')}</td>
+        <td>${formatStatus(order.status)}</td>
+        <td>${escapeHtml(formatDuration(order))}</td>
+        <td>${escapeHtml(order.description||'-')}</td>
+        <td>
+          <div class="inline">
+            <button class="small-btn primary" data-action="edit" data-id="${order.id}">تعديل</button>
+            <button class="small-btn accent" data-action="track" data-order="${escapeHtml(order.orderNo||'')}">رابط التتبع</button>
+            <button class="small-btn danger" data-action="delete" data-id="${order.id}">حذف نهائي</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById('saveBtn').addEventListener('click',()=>{
+    const existing=fields.id.value ? getOrders().find(o=>o.id===fields.id.value) : null;
+    const built=createOrderFromFields(fields, existing, 'admin');
+    if(!built) return;
+    upsertOrder(built.order);
+    renderTable();
+    if(built.order.status==='ready' && built.prevStatus!=='ready') openWhatsAppReadyMessage(built.order);
+    resetForm();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', resetForm);
+  fields.status.addEventListener('change', toggleCancel);
+  searchInput.addEventListener('input', renderTable);
+
+  tbody.addEventListener('click',(e)=>{
+    const btn=e.target.closest('button');
+    if(!btn) return;
+    if(btn.dataset.action==='edit'){
+      const order=getOrders().find(o=>o.id===btn.dataset.id);
+      if(order) fillForm(order);
+    }
+    if(btn.dataset.action==='delete'){
+      if(confirm('هل تريد حذف هذا الأوردر نهائيًا؟')){
+        hardDeleteOrder(btn.dataset.id);
+        renderTable();
+      }
+    }
+    if(btn.dataset.action==='track'){
+      window.open('track.html?order='+encodeURIComponent(btn.dataset.order),'_blank');
+    }
+  });
+
+  resetForm();
+  renderTable();
+});
+</script>
+
+</body>
+</html>
