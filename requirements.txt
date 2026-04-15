@@ -1,0 +1,4 @@
+astapi
+uvicorn
+pymupdf
+python-multipart
